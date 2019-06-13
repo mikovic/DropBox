@@ -59,5 +59,11 @@ public class ClientHandler extends Thread {
             }
         }
     }
+    public void sendListFilesServer() throws IOException {
+       fileService.fillDataTableView();
+
+       objectOutputStream.writeObject( fileService.getFileDataListServer());
+       objectOutputStream.flush();
+    }
 }
 

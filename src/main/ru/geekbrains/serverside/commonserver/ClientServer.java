@@ -27,6 +27,7 @@ public class ClientServer
                 System.out.println("New connection!");
                 ClientHandler client = new ClientHandler(socket);
                 client.start();
+                client.sendListFilesServer();
             }
         }
         catch (IOException e)

@@ -14,6 +14,7 @@ public class FileServiceClientImpl implements FileServiceClient {
     Path sourcePath = Paths.get("sourcefilesonclient");
 
     ObservableList<FileData> fileDataList = FXCollections.observableArrayList();
+    ObservableList<FileData> fileDataListServer = FXCollections.observableArrayList();
 
 
 
@@ -27,7 +28,9 @@ public class FileServiceClientImpl implements FileServiceClient {
         fullWalkFileTree(sourcePath);
     }
 
-
+    public ObservableList<FileData> getFileDataListServer() {
+        return fileDataListServer;
+    }
 
     private void fullWalkFileTree(Path sourcePath) throws IOException {
         Files.walkFileTree(sourcePath, new FileVisitor<Path>() {
