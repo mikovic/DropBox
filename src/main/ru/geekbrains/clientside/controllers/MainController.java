@@ -129,7 +129,7 @@ public class MainController {
 
 
         table1.setItems(fileService.getFileDataList());
-        table2.setItems(fileService.getFileDataList());
+
 
     }
 
@@ -139,5 +139,9 @@ public class MainController {
 
     public TextField getTextField2() {
         return textField2;
+    }
+
+    public TableView getTable2() {
+        return table2;
     }
 }

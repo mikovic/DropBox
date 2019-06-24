@@ -1,6 +1,7 @@
 package main.ru.geekbrains.clientside;
 
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import main.ru.geekbrains.clientside.controllers.MainController;
 import main.ru.geekbrains.clientside.model.*;
 import main.ru.geekbrains.clientside.service.ConnectService;
@@ -9,6 +10,9 @@ import main.ru.geekbrains.clientside.service.FileServiceClientImpl;
 import java.io.*;
 import java.lang.management.PlatformLoggingMXBean;
 import java.net.Socket;
+import java.util.Hashtable;
+import java.util.Map;
+import java.util.Set;
 
 public class Connect implements Closeable, ConnectService {
     private final String SERVER_ADDR = "localhost";
@@ -60,7 +64,8 @@ public class Connect implements Closeable, ConnectService {
                             if (responseData.getResponseStatus().equals(ResponseStatusType.ERROR)) {
 
                             }
-                        } else if (object instanceof FileSyncData) {
+                        }
+                        if (object instanceof FileSyncData) {
                             FileSyncData fileSyncData = (FileSyncData) object;
                             if (fileSyncData.getRequestType().equals(RequestType.DOWNLOAD)) {
                                 FileData fileData = fileSyncData.getFileData();
@@ -72,6 +77,24 @@ public class Connect implements Closeable, ConnectService {
                                 buffStream.close();
 
                             }
+
+                        } else if (object instanceof Hashtable) {
+                            Hashtable<String, FileData> fileDataListServer = (Hashtable<String, FileData>) object;
+                            Set<Map.Entry<String, FileData>> set = fileDataListServer.entrySet();
+                           for (Map.Entry<String, FileData> me : set){
+                                fileService.getFileDataListServer().add(me.getValue());
+                            }
+                            Platform.runLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        Thread.sleep(1000);
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+                                    mainController.getTable2().setItems(fileService.getFileDataListServer());
+                                }
+                            });
                         }
                     }
                 } catch (Exception e) {
@@ -146,6 +169,6 @@ public class Connect implements Closeable, ConnectService {
     }
 
     public void setFileService(FileServiceClientImpl fileService) {
-        this.fileService =  fileService;
+        this.fileService = fileService;
     }
 }
