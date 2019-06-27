@@ -9,14 +9,17 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import main.ru.geekbrains.clientside.Connect;
 import main.ru.geekbrains.clientside.model.FileData;
+import main.ru.geekbrains.clientside.service.FileServiceClient;
 import main.ru.geekbrains.clientside.service.FileServiceClientImpl;
 
 import java.io.IOException;
 
+
 public class MainController {
 
-
-    private FileServiceClientImpl fileService;
+    public final String EMPTY_CELL = "EMPTY CELL !!!";
+    public final String FILE_NOT = "FILE DOES NOT EXIST !!!";
+    private FileServiceClient fileService;
     private Connect connect;
     @FXML
     private Button btnRenameClientFile;
@@ -50,38 +53,91 @@ public class MainController {
     private TableColumn tableColumn2;
 
 
-
-    public void buttonAction(ActionEvent event)  throws IOException {
+    public void buttonClientAction(ActionEvent event) throws IOException {
+        FileData fileData;
         Object source = event.getSource();
         if (!(source instanceof Button)) {
             return;
         }
-        Button clickedButton = (Button) source;
-        FileData selectFileData = (FileData) table1.getSelectionModel().getSelectedItem();
+        // FileData selectFileData = (FileData) table1.getSelectionModel().getSelectedItem();
+        if (textField1.getText().trim().equals("")) {
+            setLabelText(EMPTY_CELL);
+            return;
+        } else {
+            String fileName = textField1.getText().trim();
+            fileData = fileService.getFileData(fileName);
+            if (fileData == null) {
+                setLabelText(FILE_NOT);
+                textField1.setText("");
+                return;
+            }
+            choiceClientButton((Button) source, fileData);
+        }
+
+    }
+
+    private void choiceClientButton(Button source, FileData selectFileData) throws IOException {
+        Button clickedButton = source;
         switch (clickedButton.getId()) {
             case "btnRenameClientFile":
 
                 break;
             case "btnDeleteClientFile":
+                connect.deleteClientFileData(selectFileData);
                 break;
 
             case "btnShareFile":
                 connect.share(selectFileData);
                 break;
+
+
+        }
+    }
+
+    public void buttonServerAction(ActionEvent event) throws IOException {
+        FileData fileData;
+        Object source = event.getSource();
+        if (!(source instanceof Button)) {
+            return;
+        }
+        // FileData selectFileData = (FileData) table1.getSelectionModel().getSelectedItem();
+        if (textField2.getText().trim().equals("")) {
+            setLabelText(EMPTY_CELL);
+            return;
+        } else {
+            String fileName = textField2.getText().trim();
+            fileData = fileService.findFileDataFromList(fileService.getFileDataListServer(), fileName);
+            if (fileData == null) {
+                setLabelText(FILE_NOT);
+                textField1.setText("");
+                return;
+            }
+            choiceServerButton((Button) source, fileData);
+        }
+
+    }
+
+    private void choiceServerButton(Button source, FileData selectFileData) throws IOException {
+        Button clickedButton = source;
+        switch (clickedButton.getId()) {
+
             case "btnDeleteServerFile":
+                connect.deleteServerFileData(selectFileData);
                 break;
             case "btnDownloadFile":
+                connect.downLoadFile(selectFileData);
                 break;
 
         }
-
-
     }
-    private void startClientSocket(){
+
+
+    private void startClientSocket() {
+
 
         fileService = new FileServiceClientImpl();
-        connect = new Connect(this);
-        connect.setFileService(fileService);
+        connect = new Connect(fileService, this);
+
     }
 
     public Label getLabel() {
@@ -91,7 +147,8 @@ public class MainController {
     @FXML
     public void initialize() throws IOException {
         startClientSocket();
-
+        table1.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        table2.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         tableColumn1.setCellValueFactory(new PropertyValueFactory<FileData, String>("currentFileName"));
         tableColumn2.setCellValueFactory(new PropertyValueFactory<FileData, String>("currentFileName"));
 
@@ -118,7 +175,7 @@ public class MainController {
         table2.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                FileData selectFileData = (FileData) table1.getSelectionModel().getSelectedItem();
+                FileData selectFileData = (FileData) table2.getSelectionModel().getSelectedItem();
                 if (event.getClickCount() == 2) {
 
                     textField2.setText(selectFileData.getCurrentFileName());
@@ -129,7 +186,7 @@ public class MainController {
 
 
         table1.setItems(fileService.getFileDataList());
-
+        setLabelText("YOU HAVE " + fileService.getFileDataList().size() + " FILES ON CLIENT SIDE!");
 
     }
 
@@ -143,5 +200,13 @@ public class MainController {
 
     public TableView getTable2() {
         return table2;
+    }
+
+    public void setLabelText(String labelText) {
+        label.setText(labelText);
+    }
+
+    public FileServiceClient getFileService() {
+        return fileService;
     }
 }

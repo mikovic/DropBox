@@ -6,6 +6,7 @@ import java.util.List;
 
 public class FolderData implements Serializable
 {
+    private static final long serialVersionUID = 3L;
     private String name;
     private FolderData parentFolder;
     private List<FileData> files = new ArrayList<>();

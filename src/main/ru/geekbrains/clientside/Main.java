@@ -7,12 +7,21 @@ import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import main.ru.geekbrains.clientside.controllers.MainController;
+import main.ru.geekbrains.clientside.service.FileServiceClient;
+import main.ru.geekbrains.clientside.service.FileServiceClientImpl;
+
+import static com.sun.javafx.scene.control.skin.Utils.getResource;
 
 public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getResource("fxml/main.fxml"));
+
+
+
+        FXMLLoader loader = new FXMLLoader(this.getClass().getResource("fxml/main.fxml"));
+
+        Parent root = loader.load();
         primaryStage.setTitle("Hello World");
         primaryStage.setScene(new Scene(root, 800, 600));
         primaryStage.show();

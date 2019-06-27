@@ -1,8 +1,10 @@
 package main.ru.geekbrains.clientside.service;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import main.ru.geekbrains.clientside.Connect;
+import main.ru.geekbrains.clientside.controllers.MainController;
 import main.ru.geekbrains.clientside.model.FileData;
 
 import java.io.IOException;
@@ -16,10 +18,110 @@ public class FileServiceClientImpl implements FileServiceClient {
     ObservableList<FileData> fileDataList = FXCollections.observableArrayList();
     ObservableList<FileData> fileDataListServer = FXCollections.observableArrayList();
 
+    public FileServiceClientImpl() {
+
+    }
 
 
     public ObservableList<FileData> getFileDataList() {
         return fileDataList;
+    }
+
+    @Override
+    public boolean checkFileDataList(ObservableList<FileData> fileDataList, String fileName) {
+        boolean flag = false;
+        for (FileData fileData : fileDataList){
+            if (fileData.getCurrentFileName().equals(fileName)){
+                flag = true;
+                break;
+            }
+        }
+        return flag;
+    }
+
+    @Override
+    public String findNewFileName(String currentFileName) {
+        String newFileName = currentFileName;
+        String[] words = currentFileName.split("\\.");
+        int i = 1;
+        while (checkFileDataList(fileDataList, newFileName)){
+            newFileName = words[0] + "(" + i + ")" + "." + words[1];
+            i++;
+        }
+
+        return newFileName;
+    }
+
+    @Override
+    public FileData findFileDataFromList(ObservableList<FileData> fileDataList, String fileName) {
+        FileData searchFileData = null;
+        for (FileData fileData : fileDataList){
+            if (fileData.getCurrentFileName().equals(fileName)){
+                searchFileData = fileData;
+            }
+        }
+        return searchFileData;
+    }
+
+    @Override
+    public boolean deleteFileDataFromList(ObservableList<FileData> fileDataList, String fileName) {
+        boolean flag = false;
+
+
+        FileData searchFileData = findFileDataFromList(fileDataList, fileName);
+        if(searchFileData != null){
+           fileDataList.remove(searchFileData);
+           flag = true;
+        }
+        return flag;
+    }
+
+    @Override
+    public boolean deleteClientFileData(FileData fileData) throws IOException {
+        final boolean[] flag = {false};
+        String currentFileName = fileData.getCurrentFileName();
+        Files.walkFileTree(sourcePath, new FileVisitor<Path>() {
+            @Override
+            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                String filePath = file.toAbsolutePath().toString();
+                if (filePath.endsWith(currentFileName)) {
+                    Files.delete(file);
+                    deleteFileDataFromList(fileDataList, currentFileName);
+                    flag[0] = true;
+                    return FileVisitResult.TERMINATE;
+                }
+
+                return FileVisitResult.CONTINUE;
+            }
+
+
+            @Override
+            public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+                System.out.println("This is visit file failed : " + file);
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                System.out.println("This is post visit directory : " + dir);
+                return FileVisitResult.CONTINUE;
+            }
+        });
+
+
+
+        return flag[0];
+    }
+
+    @Override
+    public FileData findFileData(FileData fileData) {
+        return null;
     }
 
     @Override
@@ -28,9 +130,8 @@ public class FileServiceClientImpl implements FileServiceClient {
         fullWalkFileTree(sourcePath);
     }
 
-    public ObservableList<FileData> getFileDataListServer() {
-        return fileDataListServer;
-    }
+
+
 
     private void fullWalkFileTree(Path sourcePath) throws IOException {
         Files.walkFileTree(sourcePath, new FileVisitor<Path>() {
@@ -67,6 +168,54 @@ public class FileServiceClientImpl implements FileServiceClient {
 
     }
 
+
+
+    @Override
+    public FileData getFileData(String fileName) throws IOException {
+
+        final FileData[] fileData = {null};
+        Files.walkFileTree(sourcePath, new FileVisitor<Path>() {
+
+            @Override
+            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                String filePath = file.toAbsolutePath().toString();
+                if (filePath.endsWith(fileName)) {
+                    System.out.println("We find the necessary file : " + file.toAbsolutePath());
+                    fileData[0] = new FileData(fileName);
+                    fileData[0].setCurrentFilePath(filePath);
+                    byte[] array = Files.readAllBytes(Paths.get(filePath));
+                    fileData[0].setContent(array);
+                    return FileVisitResult.TERMINATE;
+                }
+
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                return FileVisitResult.CONTINUE;
+            }
+
+
+        });
+        return fileData[0];
+    }
+
+
+
+    public ObservableList<FileData> getFileDataListServer() {
+        return fileDataListServer;
+    }
 
 }
 

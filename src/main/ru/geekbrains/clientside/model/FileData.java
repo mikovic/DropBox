@@ -1,14 +1,20 @@
 package main.ru.geekbrains.clientside.model;
 
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 /**
  * @author ilnaz-92@yandex.ru
  * Created on 2019-05-20
  */
+
 public class FileData implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String currentFileName;
     private String currentFilePath;
     private boolean shared;
@@ -31,8 +37,12 @@ public class FileData implements Serializable {
     }
 
     public void setCurrentFileName(String fileName) {
-        this.currentFileName = fileName;
+        currentFileName = fileName;
     }
+
+
+
+
 
     public String getCurrentFilePath() {
         return currentFilePath;

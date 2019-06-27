@@ -3,7 +3,7 @@ package main.ru.geekbrains.clientside.model;
 import java.io.Serializable;
 
 public class FileSyncData implements Serializable
-{
+{private static final long serialVersionUID = 2L;
     private FileData fileData;
     private RequestType requestType;
     private String ownerId;

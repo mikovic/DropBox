@@ -25,7 +25,7 @@
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                </padding>
             </TextField>
-            <Button fx:id="btnShareFile" layoutX="484.0" layoutY="13.0" mnemonicParsing="false" onAction="#buttonAction" prefHeight="25.0" prefWidth="78.0" text="SHARE" AnchorPane.rightAnchor="28.0" />
+            <Button fx:id="btnShareFile" layoutX="484.0" layoutY="13.0" mnemonicParsing="false" onAction="#buttonClientAction" prefHeight="25.0" prefWidth="78.0" text="SHARE" AnchorPane.rightAnchor="28.0" />
             <Label fx:id="labelYourFile" layoutX="25.0" layoutY="12.0" text="YOUR FiILE" AnchorPane.leftAnchor="25.0">
                <padding>
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
@@ -41,17 +41,17 @@
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                </padding>
             </Label>
-            <Button fx:id="btnDownloadFile" layoutX="476.0" layoutY="64.0" mnemonicParsing="false" onAction="#buttonAction" prefHeight="25.0" prefWidth="84.0" text="Download" AnchorPane.rightAnchor="30.0">
+            <Button fx:id="btnDownloadFile" layoutX="476.0" layoutY="64.0" mnemonicParsing="false" onAction="#buttonServerAction" prefHeight="25.0" prefWidth="84.0" text="Download" AnchorPane.rightAnchor="30.0">
                <padding>
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                </padding></Button>
-            <Button fx:id="btnRenameClientFile" layoutX="319.0" layoutY="13.0" mnemonicParsing="false" onAction="#buttonAction" prefHeight="27.0" prefWidth="78.0" text="RENAME" AnchorPane.rightAnchor="198.0" />
-            <Button fx:id="btnDeleteClientFile" layoutX="406.0" layoutY="12.0" mnemonicParsing="false" onAction="#buttonAction" prefHeight="27.0" prefWidth="65.0" text="DELETE" AnchorPane.rightAnchor="124.0">
+            <Button fx:id="btnRenameClientFile" layoutX="319.0" layoutY="13.0" mnemonicParsing="false" onAction="#buttonClientAction" prefHeight="27.0" prefWidth="78.0" text="RENAME" AnchorPane.rightAnchor="198.0" />
+            <Button fx:id="btnDeleteClientFile" layoutX="406.0" layoutY="12.0" mnemonicParsing="false" onAction="#buttonClientAction" prefHeight="27.0" prefWidth="65.0" text="DELETE" AnchorPane.rightAnchor="124.0">
                <padding>
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                </padding>
             </Button>
-            <Button fx:id="btnDeleteServerFile" layoutX="395.0" layoutY="64.0" mnemonicParsing="false" onAction="#buttonAction" prefHeight="27.0" prefWidth="65.0" text="DELETE" AnchorPane.rightAnchor="135.0">
+            <Button fx:id="btnDeleteServerFile" layoutX="395.0" layoutY="64.0" mnemonicParsing="false" onAction="#buttonServerAction" prefHeight="27.0" prefWidth="65.0" text="DELETE" AnchorPane.rightAnchor="135.0">
                <padding>
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                </padding>

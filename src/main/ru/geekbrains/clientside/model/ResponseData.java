@@ -4,10 +4,12 @@ import java.io.Serializable;
 
 public class ResponseData implements Serializable
 {
+    private static final long serialVersionUID = 5L;
     private FileData fileData; // can be null
     private FolderData folderData; // can be null
     private ResponseStatusType responseStatus;
     private String message; //can be null
+    private String currentFileName;
 
     public FileData getFileData()
     {
@@ -47,6 +49,14 @@ public class ResponseData implements Serializable
     public void setMessage(String message)
     {
         this.message = message;
+    }
+
+    public void setCurrentFileName(String currentFileName) {
+        this.currentFileName = currentFileName;
+    }
+
+    public String getCurrentFileName() {
+        return currentFileName;
     }
 }
 

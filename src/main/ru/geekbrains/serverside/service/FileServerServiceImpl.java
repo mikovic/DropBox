@@ -20,7 +20,7 @@ public class FileServerServiceImpl implements FileServerService {
     private ObjectInputStream objectInputStream;
     private BufferedOutputStream buffStream;
     private ResponseData successResponse;
-    Hashtable<String,FileData> fileDataListServer;
+    Hashtable<String, FileData> fileDataListServer;
     Path sourcePath = Paths.get(DIR_SERVER);
 
     public FileServerServiceImpl(ObjectInputStream objectInputStream, ObjectOutputStream objectOutputStream) {
@@ -39,8 +39,8 @@ public class FileServerServiceImpl implements FileServerService {
                     new FileOutputStream(filePathServer));
             buffStream.write(content);
             buffStream.close();
-            successResponse = ResponseUtil.createSuccessResponse(fileData.getCurrentFileName() + " загрузился");
-
+            successResponse = ResponseUtil.createSuccessAddFileResponse(fileData.getCurrentFileName() + " загрузился");
+            successResponse.setCurrentFileName(fileData.getCurrentFileName());
             objectOutputStream.writeObject(successResponse);
             objectOutputStream.flush();
 
@@ -59,7 +59,8 @@ public class FileServerServiceImpl implements FileServerService {
         File filePath = new File(filePathServer);
         if (filePath.exists()) {
             filePath.delete();
-            successResponse = ResponseUtil.createErrorResponse(fileData.getCurrentFileName() + " удалили");
+            successResponse = ResponseUtil.createSuccessDeleteFileResponse(fileData.getCurrentFileName() + " удалили");
+           successResponse.setCurrentFileName(fileData.getCurrentFileName());
             try {
                 objectOutputStream.writeObject(successResponse);
             } catch (IOException e) {
@@ -129,7 +130,7 @@ public class FileServerServiceImpl implements FileServerService {
                 byte[] array = Files.readAllBytes(Paths.get(file.toAbsolutePath().toString()));
                 fileData.setContent(array);
                 fileData.setShared(true);
-                FileServerServiceImpl.this.fileDataListServer.put(fileData.getCurrentFileName(),fileData);
+                FileServerServiceImpl.this.fileDataListServer.put(fileData.getCurrentFileName(), fileData);
                 return FileVisitResult.CONTINUE;
             }
 
@@ -152,7 +153,7 @@ public class FileServerServiceImpl implements FileServerService {
     private String getPathFile(FileData fileData) {
         Path sourcePath = Paths.get(DIR_SERVER);
         String fileName = fileData.getCurrentFileName();
-        return sourcePath.toAbsolutePath().toString()+ File.separator + fileName;
+        return sourcePath.toAbsolutePath().toString() + File.separator + fileName;
     }
 
     public ObjectInputStream getObjectInputStream() {
@@ -171,7 +172,7 @@ public class FileServerServiceImpl implements FileServerService {
         this.objectOutputStream = objectOutputStream;
     }
 
-    public Hashtable<String,FileData> getFileDataListServer() {
+    public Hashtable<String, FileData> getFileDataListServer() {
         return fileDataListServer;
     }
 }
