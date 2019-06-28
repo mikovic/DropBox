@@ -4,9 +4,16 @@ import javafx.collections.ListChangeListener;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.Window;
 import main.ru.geekbrains.clientside.Connect;
 import main.ru.geekbrains.clientside.model.FileData;
 import main.ru.geekbrains.clientside.service.FileServiceClient;
@@ -21,6 +28,11 @@ public class MainController {
     public final String FILE_NOT = "FILE DOES NOT EXIST !!!";
     private FileServiceClient fileService;
     private Connect connect;
+    private Stage mainStage;
+    private FXMLLoader fxmLloader = new FXMLLoader();
+    private EditController editController;
+    private Stage editModalStage;
+    private Parent fxmlEdit;
     @FXML
     private Button btnRenameClientFile;
     @FXML
@@ -71,16 +83,17 @@ public class MainController {
                 textField1.setText("");
                 return;
             }
-            choiceClientButton((Button) source, fileData);
+            choiceClientButton(event, fileData);
         }
 
     }
 
-    private void choiceClientButton(Button source, FileData selectFileData) throws IOException {
-        Button clickedButton = source;
+    private void choiceClientButton(ActionEvent event, FileData selectFileData) throws IOException {
+        Button clickedButton = (Button) event.getSource();
         switch (clickedButton.getId()) {
-            case "btnRenameClientFile":
 
+            case "btnRenameClientFile":
+                showEditModal();
                 break;
             case "btnDeleteClientFile":
                 connect.deleteClientFileData(selectFileData);
@@ -93,6 +106,7 @@ public class MainController {
 
         }
     }
+
 
     public void buttonServerAction(ActionEvent event) throws IOException {
         FileData fileData;
@@ -131,6 +145,26 @@ public class MainController {
         }
     }
 
+    public void showEditModal() {
+
+        if (editModalStage == null) {
+            editModalStage = new Stage();
+            editModalStage.setTitle("Rename File");
+            editModalStage.setMinHeight(120);
+            editModalStage.setMinWidth(400);
+            editModalStage.setResizable(false);
+            editModalStage.setScene(new Scene(fxmlEdit));
+            editModalStage.initModality(Modality.WINDOW_MODAL);
+      /*      Node node = (Node) actionEvent.getSource();
+            Window ownerWindow = node.getScene().getWindow();
+            stage.initOwner(ownerWindow);    */
+            editModalStage.initOwner(mainStage);
+        }
+        editModalStage.showAndWait();
+
+
+    }
+
 
     private void startClientSocket() {
 
@@ -151,9 +185,24 @@ public class MainController {
         table2.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         tableColumn1.setCellValueFactory(new PropertyValueFactory<FileData, String>("currentFileName"));
         tableColumn2.setCellValueFactory(new PropertyValueFactory<FileData, String>("currentFileName"));
-
-
         fileService.fillDataTableView();
+        initLoader();
+        initListeners();
+
+
+        table1.setItems(fileService.getFileDataList());
+        setLabelText("YOU HAVE " + fileService.getFileDataList().size() + " FILES ON CLIENT SIDE!");
+
+    }
+
+    private void initLoader() throws IOException {
+        fxmLloader.setLocation(getClass().getResource("../fxml/edit.fxml"));
+        fxmlEdit = fxmLloader.load();
+        editController = fxmLloader.getController();
+
+    }
+
+    private void initListeners() {
         fileService.getFileDataList().addListener(new ListChangeListener<FileData>() {
             @Override
             public void onChanged(Change<? extends FileData> c) {
@@ -183,11 +232,6 @@ public class MainController {
                 }
             }
         });
-
-
-        table1.setItems(fileService.getFileDataList());
-        setLabelText("YOU HAVE " + fileService.getFileDataList().size() + " FILES ON CLIENT SIDE!");
-
     }
 
     public TextField getTextField1() {
@@ -208,5 +252,9 @@ public class MainController {
 
     public FileServiceClient getFileService() {
         return fileService;
+    }
+
+    public void setMainStage(Stage mainStage) {
+        this.mainStage = mainStage;
     }
 }

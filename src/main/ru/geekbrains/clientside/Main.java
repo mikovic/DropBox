@@ -15,13 +15,14 @@ import static com.sun.javafx.scene.control.skin.Utils.getResource;
 public class Main extends Application {
 
     @Override
-    public void start(Stage primaryStage) throws Exception{
+    public void start(Stage primaryStage) throws Exception {
 
 
-
-        FXMLLoader loader = new FXMLLoader(this.getClass().getResource("fxml/main.fxml"));
-
+        FXMLLoader loader = new FXMLLoader();
+        loader.setLocation(getClass().getResource("fxml/main.fxml"));
         Parent root = loader.load();
+        MainController mainController = loader.getController();
+        mainController.setMainStage(primaryStage);
         primaryStage.setTitle("Hello World");
         primaryStage.setScene(new Scene(root, 800, 600));
         primaryStage.show();
