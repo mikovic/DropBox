@@ -57,6 +57,7 @@ public class Connect implements Closeable, ConnectService {
                                         }
 
                                         String currentFileName = responseData.getCurrentFileName();
+                                        String currentFilePath = responseData.getCurrentFilePath();
                                         ObservableList<FileData> fileDataListServer = fileService.getFileDataListServer();
                                         FileData fileData = fileService.findFileDataFromList(fileDataListServer, currentFileName);
                                         if (fileData != null) {
@@ -66,6 +67,7 @@ public class Connect implements Closeable, ConnectService {
                                         try {
                                             fileData = fileService.getFileData(currentFileName);
                                             fileData.setShared(true);
+                                            fileData.setCurrentFilePath(currentFilePath);
                                             fileService.getFileDataListServer().add(fileData);
                                         } catch (IOException e) {
                                             e.printStackTrace();
@@ -118,6 +120,9 @@ public class Connect implements Closeable, ConnectService {
                                             fileData.setPreviousFileName(fileName);
                                             fileData.setCurrentFileName(newFileName);
                                             fileService.getFileDataList().add(fileData);
+                                            String filePath = fileData.getCurrentFilePath();
+                                            filePath.replace(fileName, newFileName);
+                                            fileData.setCurrentFilePath(filePath);
 
                                         }
 
@@ -236,7 +241,7 @@ public class Connect implements Closeable, ConnectService {
     public boolean deleteClientFileData(FileData fileData) throws IOException {
         boolean flag = false;
         if (fileService.deleteClientFileData(fileData)) {
-
+            setFieldText1("");
             setlabelText("FILE " + fileData.getCurrentFileName() + " was deleted");
             flag = true;
         }

@@ -7,6 +7,7 @@ import main.ru.geekbrains.clientside.Connect;
 import main.ru.geekbrains.clientside.controllers.MainController;
 import main.ru.geekbrains.clientside.model.FileData;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -30,8 +31,8 @@ public class FileServiceClientImpl implements FileServiceClient {
     @Override
     public boolean checkFileDataList(ObservableList<FileData> fileDataList, String fileName) {
         boolean flag = false;
-        for (FileData fileData : fileDataList){
-            if (fileData.getCurrentFileName().equals(fileName)){
+        for (FileData fileData : fileDataList) {
+            if (fileData.getCurrentFileName().equals(fileName)) {
                 flag = true;
                 break;
             }
@@ -44,7 +45,7 @@ public class FileServiceClientImpl implements FileServiceClient {
         String newFileName = currentFileName;
         String[] words = currentFileName.split("\\.");
         int i = 1;
-        while (checkFileDataList(fileDataList, newFileName)){
+        while (checkFileDataList(fileDataList, newFileName)) {
             newFileName = words[0] + "(" + i + ")" + "." + words[1];
             i++;
         }
@@ -52,11 +53,41 @@ public class FileServiceClientImpl implements FileServiceClient {
         return newFileName;
     }
 
+
+
+    @Override
+    public boolean renameFileData(FileData fileData, String newFileName) {
+
+        boolean flag = false;
+        String oldFileName = fileData.getCurrentFileName();
+        String path = fileData.getCurrentFilePath();
+        String[] oldWords = oldFileName.split("\\.");
+        String newNameFile = newFileName + "." + oldWords[1];
+        String newPath = path.replace(oldFileName, newNameFile);
+        File file = new File(path);
+        File newFile = new File(newPath);
+        file.renameTo(newFile);
+        FileData newFileData = new FileData();
+        FileData searchFileData = findFileDataFromList(fileDataList, oldFileName);
+        newFileData.setCurrentFileName(newNameFile);
+        newFileData.setPreviousFileName(oldFileName);
+        newFileData.setCurrentFilePath(newPath);
+        newFileData.setShared(searchFileData.isShared());
+        newFileData.setContent(searchFileData.getContent());
+        newFileData.setPreviousFilePath(path);
+        newFileData.setCurrentFilePath(newPath);
+        fileDataList.remove(searchFileData);
+        fileDataList.add(newFileData);
+        return true;
+    }
+
+
+
     @Override
     public FileData findFileDataFromList(ObservableList<FileData> fileDataList, String fileName) {
         FileData searchFileData = null;
-        for (FileData fileData : fileDataList){
-            if (fileData.getCurrentFileName().equals(fileName)){
+        for (FileData fileData : fileDataList) {
+            if (fileData.getCurrentFileName().equals(fileName)) {
                 searchFileData = fileData;
             }
         }
@@ -69,9 +100,9 @@ public class FileServiceClientImpl implements FileServiceClient {
 
 
         FileData searchFileData = findFileDataFromList(fileDataList, fileName);
-        if(searchFileData != null){
-           fileDataList.remove(searchFileData);
-           flag = true;
+        if (searchFileData != null) {
+            fileDataList.remove(searchFileData);
+            flag = true;
         }
         return flag;
     }
@@ -115,7 +146,6 @@ public class FileServiceClientImpl implements FileServiceClient {
         });
 
 
-
         return flag[0];
     }
 
@@ -129,8 +159,6 @@ public class FileServiceClientImpl implements FileServiceClient {
 
         fullWalkFileTree(sourcePath);
     }
-
-
 
 
     private void fullWalkFileTree(Path sourcePath) throws IOException {
@@ -167,7 +195,6 @@ public class FileServiceClientImpl implements FileServiceClient {
 
 
     }
-
 
 
     @Override
@@ -210,7 +237,6 @@ public class FileServiceClientImpl implements FileServiceClient {
         });
         return fileData[0];
     }
-
 
 
     public ObservableList<FileData> getFileDataListServer() {

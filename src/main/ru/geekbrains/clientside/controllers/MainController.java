@@ -26,6 +26,11 @@ public class MainController {
 
     public final String EMPTY_CELL = "EMPTY CELL !!!";
     public final String FILE_NOT = "FILE DOES NOT EXIST !!!";
+    public final String FILE_RENAME = "FILE SUCCESSFUL RENAME !!!";
+    public final String FILE_NOT_EXTENSION = "FILE IS'NOT EXTENSION !!!";
+    public final String FILE_ANOTHER__EXTENSION = "FILE HAVE ANOTHER EXTENSION !!!";
+
+
     private FileServiceClient fileService;
     private Connect connect;
     private Stage mainStage;
@@ -93,7 +98,14 @@ public class MainController {
         switch (clickedButton.getId()) {
 
             case "btnRenameClientFile":
+                String oldFileName = textField1.getText();
                 showEditModal();
+                String newFileName = editController.getNewFileName();
+                if(fileService.renameFileData(selectFileData, newFileName)){
+                    setLabelText(FILE_RENAME);
+                    textField1.setText("");
+                }
+
                 break;
             case "btnDeleteClientFile":
                 connect.deleteClientFileData(selectFileData);

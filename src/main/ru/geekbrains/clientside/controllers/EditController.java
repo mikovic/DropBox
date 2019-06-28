@@ -25,6 +25,8 @@ public class EditController {
     @FXML
     private Button buttonCancel;
 
+    private String newFileName;
+
 
 
 
@@ -33,11 +35,20 @@ public class EditController {
         if (!(source instanceof Button)) {
             return;
         }
+        this.newFileName = textFieldModal.getText().trim();
+        actionClose(actionEvent);
+
     }
 
     public void actionClose(javafx.event.ActionEvent actionEvent) {
         Node node = (Node) actionEvent.getSource();
         Stage stage = (Stage) node.getScene().getWindow();
-        stage.close();
+        stage.hide();
     }
+
+    public String getNewFileName() {
+        return newFileName;
+    }
+
+
 }

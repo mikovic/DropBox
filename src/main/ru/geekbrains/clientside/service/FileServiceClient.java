@@ -31,4 +31,8 @@ public interface FileServiceClient {
 
     public String findNewFileName(String currentFileName);
 
+
+
+    public boolean renameFileData (FileData fileData, String newFileName);
+
 }

@@ -41,6 +41,7 @@ public class FileServerServiceImpl implements FileServerService {
             buffStream.close();
             successResponse = ResponseUtil.createSuccessAddFileResponse(fileData.getCurrentFileName() + " загрузился");
             successResponse.setCurrentFileName(fileData.getCurrentFileName());
+            successResponse.setCurrentFilePath(fileData.getCurrentFilePath());
             objectOutputStream.writeObject(successResponse);
             objectOutputStream.flush();
 
@@ -60,7 +61,7 @@ public class FileServerServiceImpl implements FileServerService {
         if (filePath.exists()) {
             filePath.delete();
             successResponse = ResponseUtil.createSuccessDeleteFileResponse(fileData.getCurrentFileName() + " удалили");
-           successResponse.setCurrentFileName(fileData.getCurrentFileName());
+            successResponse.setCurrentFileName(fileData.getCurrentFileName());
             try {
                 objectOutputStream.writeObject(successResponse);
             } catch (IOException e) {

@@ -10,6 +10,7 @@ public class ResponseData implements Serializable
     private ResponseStatusType responseStatus;
     private String message; //can be null
     private String currentFileName;
+    private String currentFilePath;
 
     public FileData getFileData()
     {
@@ -55,8 +56,16 @@ public class ResponseData implements Serializable
         this.currentFileName = currentFileName;
     }
 
+    public void setCurrentFilePath(String currentFilePath) {
+        this.currentFilePath = currentFilePath;
+    }
+
     public String getCurrentFileName() {
         return currentFileName;
+    }
+
+    public String getCurrentFilePath() {
+        return currentFilePath;
     }
 }
 
