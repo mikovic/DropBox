@@ -28,4 +28,15 @@ public class ResponseUtil
         responseData.setMessage(msg);
         return responseData;
     }
+    public static ResponseData createSuccessRenameFileResponse(String newFileName, String oldFileName, String newPath, String msg)
+    {
+        ResponseData responseData = new ResponseData();
+        responseData.setResponseStatus(ResponseStatusType.SUCCESSRENAME);
+        responseData.setCurrentFileName(newFileName);
+        responseData.setPreviousFileName(oldFileName);
+        responseData.setCurrentFilePathServer(newPath);
+        responseData.setMessage(msg);
+        return responseData;
+    }
+
 }

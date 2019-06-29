@@ -1,4 +1,4 @@
 package main.ru.geekbrains.clientside.model;
 
 public enum RequestType
-{DOWNLOAD, DELETE, UPDATE, ADD}
+{DOWNLOAD, DELETE, UPDATE, ADD, RENAME}

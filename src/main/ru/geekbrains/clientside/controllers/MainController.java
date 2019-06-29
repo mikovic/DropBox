@@ -48,6 +48,8 @@ public class MainController {
     private Button btnDownloadFile;
     @FXML
     private Button btnDeleteServerFile;
+    @FXML
+    private Button btnRenameFileServer;
 
 
     @FXML
@@ -146,6 +148,12 @@ public class MainController {
     private void choiceServerButton(Button source, FileData selectFileData) throws IOException {
         Button clickedButton = source;
         switch (clickedButton.getId()) {
+
+            case "btnRenameFileServer":
+
+                showEditModal();
+                String newFileName = editController.getNewFileName();
+                connect.renameServerFile(selectFileData, newFileName);
 
             case "btnDeleteServerFile":
                 connect.deleteServerFileData(selectFileData);

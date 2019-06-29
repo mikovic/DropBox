@@ -7,6 +7,7 @@ import main.ru.geekbrains.clientside.model.*;
 import main.ru.geekbrains.clientside.service.ConnectService;
 import main.ru.geekbrains.clientside.service.FileServiceClient;
 import main.ru.geekbrains.clientside.service.FileServiceClientImpl;
+import main.ru.geekbrains.utilits.RequestUtil;
 
 import java.io.*;
 import java.lang.management.PlatformLoggingMXBean;
@@ -58,6 +59,7 @@ public class Connect implements Closeable, ConnectService {
 
                                         String currentFileName = responseData.getCurrentFileName();
                                         String currentFilePath = responseData.getCurrentFilePath();
+                                        String currentFilePathServer = responseData.getCurrentFilePathServer();
                                         ObservableList<FileData> fileDataListServer = fileService.getFileDataListServer();
                                         FileData fileData = fileService.findFileDataFromList(fileDataListServer, currentFileName);
                                         if (fileData != null) {
@@ -68,10 +70,12 @@ public class Connect implements Closeable, ConnectService {
                                             fileData = fileService.getFileData(currentFileName);
                                             fileData.setShared(true);
                                             fileData.setCurrentFilePath(currentFilePath);
-                                            fileService.getFileDataListServer().add(fileData);
+                                            fileData.setCurrentFilePathServer(currentFilePathServer);
+
                                         } catch (IOException e) {
                                             e.printStackTrace();
                                         }
+                                        fileService.getFileDataListServer().add(fileData);
                                         setlabelText(responseData.getMessage());
                                         setFieldText1("");
                                     }
@@ -99,6 +103,36 @@ public class Connect implements Closeable, ConnectService {
                                     }
                                 });
                             }
+
+                            if (responseData.getResponseStatus().equals(ResponseStatusType.SUCCESSRENAME)) {
+                                Platform.runLater(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        try {
+                                            Thread.sleep(1000);
+                                        } catch (InterruptedException e) {
+                                            e.printStackTrace();
+                                        }
+
+
+                                        FileData newFileData = new FileData();
+                                        String oldFileName = responseData.getPreviousFileName();
+                                        FileData searchFileData = fileService.findFileDataFromList(fileService.getFileDataListServer(), oldFileName);
+                                        newFileData.setCurrentFileName(responseData.getCurrentFileName());
+                                        newFileData.setPreviousFileName(oldFileName);
+                                        newFileData.setCurrentFilePath(responseData.getCurrentFilePath());
+                                        newFileData.setShared(searchFileData.isShared());
+                                        newFileData.setContent(searchFileData.getContent());
+                                        newFileData.setPreviousFilePath(searchFileData.getPreviousFilePath());
+                                        fileService.getFileDataListServer().remove(searchFileData);
+                                        fileService.getFileDataListServer().add(newFileData);
+                                        setlabelText(responseData.getMessage());
+                                        setFieldText2("");
+                                        setFieldText1("");
+                                    }
+                                });
+                            }
+
                         }
                         if (object instanceof FileSyncData) {
                             FileSyncData fileSyncData = (FileSyncData) object;
@@ -119,7 +153,6 @@ public class Connect implements Closeable, ConnectService {
                                         if (!fileName.equals(newFileName)) {
                                             fileData.setPreviousFileName(fileName);
                                             fileData.setCurrentFileName(newFileName);
-                                            fileService.getFileDataList().add(fileData);
                                             String filePath = fileData.getCurrentFilePath();
                                             filePath.replace(fileName, newFileName);
                                             fileData.setCurrentFilePath(filePath);
@@ -140,9 +173,10 @@ public class Connect implements Closeable, ConnectService {
                                         } catch (IOException e) {
                                             e.printStackTrace();
                                         }
-
+                                        fileService.getFileDataList().add(fileData);
                                         setlabelText(fileData.getCurrentFileName() + " WAS UPLOADED SUCCESSFULLY");
                                         setFieldText2("");
+                                        setFieldText1("");
 
 
                                     }
@@ -277,4 +311,11 @@ public class Connect implements Closeable, ConnectService {
         this.fileService = fileService;
     }
 
+    public void renameServerFile(FileData selectFileData, String newFileName) throws IOException {
+        RequestData requestData = RequestUtil.createRequestRenameFile(selectFileData, newFileName);
+        out.writeObject(requestData);
+        out.flush();
+
+
+    }
 }

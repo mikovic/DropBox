@@ -7,6 +7,7 @@ public class FileSyncData implements Serializable
     private FileData fileData;
     private RequestType requestType;
     private String ownerId;
+    private String newFileName;
 
     public FileData getFileData()
     {
@@ -36,6 +37,14 @@ public class FileSyncData implements Serializable
     public void setOwnerId(String ownerId)
     {
         this.ownerId = ownerId;
+    }
+
+    public String getNewFileName() {
+        return newFileName;
+    }
+
+    public void setNewFileName(String newFileName) {
+        this.newFileName = newFileName;
     }
 }
 

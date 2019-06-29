@@ -17,6 +17,7 @@ public class FileData implements Serializable {
     private static final long serialVersionUID = 1L;
     private String currentFileName;
     private String currentFilePath;
+    private String currentFilePathServer;
     private boolean shared;
     private byte[] content; // can be nullable
     private String mime; //can be nullable
@@ -41,8 +42,13 @@ public class FileData implements Serializable {
     }
 
 
+    public String getCurrentFilePathServer() {
+        return currentFilePathServer;
+    }
 
-
+    public void setCurrentFilePathServer(String currentFilePathServer) {
+        this.currentFilePathServer = currentFilePathServer;
+    }
 
     public String getCurrentFilePath() {
         return currentFilePath;

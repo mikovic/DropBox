@@ -2,10 +2,7 @@ package main.ru.geekbrains.serverside.service;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import main.ru.geekbrains.clientside.model.FileData;
-import main.ru.geekbrains.clientside.model.FileSyncData;
-import main.ru.geekbrains.clientside.model.RequestType;
-import main.ru.geekbrains.clientside.model.ResponseData;
+import main.ru.geekbrains.clientside.model.*;
 import main.ru.geekbrains.clientside.service.FileServiceClientImpl;
 import main.ru.geekbrains.utilits.ResponseUtil;
 
@@ -16,6 +13,7 @@ import java.util.Hashtable;
 
 public class FileServerServiceImpl implements FileServerService {
     private final String DIR_SERVER = "sourcefilesonserver";
+    private String FILE_RENAME = "FILE RENAME SUCCESS !!!";
     private ObjectOutputStream objectOutputStream;
     private ObjectInputStream objectInputStream;
     private BufferedOutputStream buffStream;
@@ -42,6 +40,7 @@ public class FileServerServiceImpl implements FileServerService {
             successResponse = ResponseUtil.createSuccessAddFileResponse(fileData.getCurrentFileName() + " загрузился");
             successResponse.setCurrentFileName(fileData.getCurrentFileName());
             successResponse.setCurrentFilePath(fileData.getCurrentFilePath());
+            successResponse.setCurrentFilePathServer(filePathServer);
             objectOutputStream.writeObject(successResponse);
             objectOutputStream.flush();
 
@@ -89,6 +88,7 @@ public class FileServerServiceImpl implements FileServerService {
             FileData file = new FileData();
             file.setContent(content);
             file.setCurrentFileName(filePath.getName());
+            file.setCurrentFilePath(filePathServer);
             FileSyncData fileSyncData = new FileSyncData();
             fileSyncData.setFileData(file);
             fileSyncData.setRequestType(RequestType.DOWNLOAD);
@@ -112,6 +112,27 @@ public class FileServerServiceImpl implements FileServerService {
     @Override
     public void sendListFilesServer() {
 
+    }
+
+    @Override
+    public boolean rename(RequestData requestData) {
+        boolean flag = false;
+        String oldFileName = requestData.getCurrentFileName();
+        String path = requestData.getCurrentFilePathServer();
+        String[] oldWords = oldFileName.split("\\.");
+        String newNameFile = requestData.getNewFileName() + "." + oldWords[1];
+        String newPath = path.replace(oldFileName, newNameFile);
+        File file = new File(path);
+        File newFile = new File(newPath);
+        file.renameTo(newFile);
+        successResponse = ResponseUtil.createSuccessRenameFileResponse(newNameFile, oldFileName, newPath, FILE_RENAME );
+        try {
+            objectOutputStream.writeObject(successResponse);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        flag = true;
+        return flag;
     }
 
 
