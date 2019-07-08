@@ -1,16 +1,23 @@
 package main.ru.geekbrains.clientside.model;
 
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 /**
  * @author ilnaz-92@yandex.ru
  * Created on 2019-05-20
  */
+
 public class FileData implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String currentFileName;
     private String currentFilePath;
+    private String currentFilePathServer;
     private boolean shared;
     private byte[] content; // can be nullable
     private String mime; //can be nullable
@@ -31,7 +38,16 @@ public class FileData implements Serializable {
     }
 
     public void setCurrentFileName(String fileName) {
-        this.currentFileName = fileName;
+        currentFileName = fileName;
+    }
+
+
+    public String getCurrentFilePathServer() {
+        return currentFilePathServer;
+    }
+
+    public void setCurrentFilePathServer(String currentFilePathServer) {
+        this.currentFilePathServer = currentFilePathServer;
     }
 
     public String getCurrentFilePath() {
@@ -89,5 +105,6 @@ public class FileData implements Serializable {
     public void setSize(int size) {
         this.size = size;
     }
+
 
 }

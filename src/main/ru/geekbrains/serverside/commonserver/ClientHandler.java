@@ -49,8 +49,20 @@ public class ClientHandler extends Thread {
                         fileService.download(fileData);
 
                     }
+
+
                 } else if (object instanceof FolderSyncData) {
                     FolderSyncData folderSyncData = (FolderSyncData) object;
+                } else  if (object instanceof RequestData) {
+                    RequestData requestData = (RequestData) object;
+                    if (requestData.getRequestType() == RequestType.RENAME) {
+                        fileService.rename(requestData);
+                    }
+                    if (requestData.getRequestType() == RequestType.DELETE) {
+                        fileService.rename(requestData);
+                    }
+
+
                 }
             } catch (IOException e) {
                 e.printStackTrace();

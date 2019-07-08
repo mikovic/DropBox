@@ -2,10 +2,7 @@ package main.ru.geekbrains.serverside.service;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import main.ru.geekbrains.clientside.model.FileData;
-import main.ru.geekbrains.clientside.model.FileSyncData;
-import main.ru.geekbrains.clientside.model.RequestType;
-import main.ru.geekbrains.clientside.model.ResponseData;
+import main.ru.geekbrains.clientside.model.*;
 import main.ru.geekbrains.clientside.service.FileServiceClientImpl;
 import main.ru.geekbrains.utilits.ResponseUtil;
 
@@ -16,11 +13,12 @@ import java.util.Hashtable;
 
 public class FileServerServiceImpl implements FileServerService {
     private final String DIR_SERVER = "sourcefilesonserver";
+    private String FILE_RENAME = "FILE RENAME SUCCESS !!!";
     private ObjectOutputStream objectOutputStream;
     private ObjectInputStream objectInputStream;
     private BufferedOutputStream buffStream;
     private ResponseData successResponse;
-    Hashtable<String,FileData> fileDataListServer;
+    Hashtable<String, FileData> fileDataListServer;
     Path sourcePath = Paths.get(DIR_SERVER);
 
     public FileServerServiceImpl(ObjectInputStream objectInputStream, ObjectOutputStream objectOutputStream) {
@@ -39,8 +37,10 @@ public class FileServerServiceImpl implements FileServerService {
                     new FileOutputStream(filePathServer));
             buffStream.write(content);
             buffStream.close();
-            successResponse = ResponseUtil.createSuccessResponse(fileData.getCurrentFileName() + " загрузился");
-
+            successResponse = ResponseUtil.createSuccessAddFileResponse(fileData.getCurrentFileName() + " загрузился");
+            successResponse.setCurrentFileName(fileData.getCurrentFileName());
+            successResponse.setCurrentFilePath(fileData.getCurrentFilePath());
+            successResponse.setCurrentFilePathServer(filePathServer);
             objectOutputStream.writeObject(successResponse);
             objectOutputStream.flush();
 
@@ -59,7 +59,8 @@ public class FileServerServiceImpl implements FileServerService {
         File filePath = new File(filePathServer);
         if (filePath.exists()) {
             filePath.delete();
-            successResponse = ResponseUtil.createErrorResponse(fileData.getCurrentFileName() + " удалили");
+            successResponse = ResponseUtil.createSuccessDeleteFileResponse(fileData.getCurrentFileName() + " удалили");
+            successResponse.setCurrentFileName(fileData.getCurrentFileName());
             try {
                 objectOutputStream.writeObject(successResponse);
             } catch (IOException e) {
@@ -87,6 +88,7 @@ public class FileServerServiceImpl implements FileServerService {
             FileData file = new FileData();
             file.setContent(content);
             file.setCurrentFileName(filePath.getName());
+            file.setCurrentFilePath(filePathServer);
             FileSyncData fileSyncData = new FileSyncData();
             fileSyncData.setFileData(file);
             fileSyncData.setRequestType(RequestType.DOWNLOAD);
@@ -112,6 +114,27 @@ public class FileServerServiceImpl implements FileServerService {
 
     }
 
+    @Override
+    public boolean rename(RequestData requestData) {
+        boolean flag = false;
+        String oldFileName = requestData.getCurrentFileName();
+        String path = requestData.getCurrentFilePathServer();
+        String[] oldWords = oldFileName.split("\\.");
+        String newNameFile = requestData.getNewFileName() + "." + oldWords[1];
+        String newPath = path.replace(oldFileName, newNameFile);
+        File file = new File(path);
+        File newFile = new File(newPath);
+        file.renameTo(newFile);
+        successResponse = ResponseUtil.createSuccessRenameFileResponse(newNameFile, oldFileName, newPath, FILE_RENAME );
+        try {
+            objectOutputStream.writeObject(successResponse);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        flag = true;
+        return flag;
+    }
+
 
     private void fullWalkFileTree(Path sourcePath) throws IOException {
         Files.walkFileTree(sourcePath, new FileVisitor<Path>() {
@@ -129,7 +152,7 @@ public class FileServerServiceImpl implements FileServerService {
                 byte[] array = Files.readAllBytes(Paths.get(file.toAbsolutePath().toString()));
                 fileData.setContent(array);
                 fileData.setShared(true);
-                FileServerServiceImpl.this.fileDataListServer.put(fileData.getCurrentFileName(),fileData);
+                FileServerServiceImpl.this.fileDataListServer.put(fileData.getCurrentFileName(), fileData);
                 return FileVisitResult.CONTINUE;
             }
 
@@ -152,7 +175,7 @@ public class FileServerServiceImpl implements FileServerService {
     private String getPathFile(FileData fileData) {
         Path sourcePath = Paths.get(DIR_SERVER);
         String fileName = fileData.getCurrentFileName();
-        return sourcePath.toAbsolutePath().toString()+ File.separator + fileName;
+        return sourcePath.toAbsolutePath().toString() + File.separator + fileName;
     }
 
     public ObjectInputStream getObjectInputStream() {
@@ -171,7 +194,7 @@ public class FileServerServiceImpl implements FileServerService {
         this.objectOutputStream = objectOutputStream;
     }
 
-    public Hashtable<String,FileData> getFileDataListServer() {
+    public Hashtable<String, FileData> getFileDataListServer() {
         return fileDataListServer;
     }
 }

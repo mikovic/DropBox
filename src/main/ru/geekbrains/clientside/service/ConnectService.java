@@ -5,9 +5,13 @@ import main.ru.geekbrains.clientside.model.FileData;
 import java.io.IOException;
 
 public interface ConnectService {
-    void share(FileData selectFileData) throws IOException;
-    void setlabelText(String text);
-    void setFieldText1(String text);
-    void setFieldText2(String text);
-    void getListFileFromServer();
+    public void share(FileData selectFileData) throws IOException;
+    public void setlabelText(String text);
+    public void setFieldText1(String text);
+    public void setFieldText2(String text);
+    public void getListFileFromServer();
+    public boolean deleteClientFileData(FileData fileData) throws IOException;
+    public boolean deleteServerFileData(FileData fileData) throws IOException;
+    public boolean downLoadFile(FileData fileData) throws IOException;
+
 }

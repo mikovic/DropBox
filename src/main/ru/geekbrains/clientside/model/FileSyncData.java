@@ -3,10 +3,11 @@ package main.ru.geekbrains.clientside.model;
 import java.io.Serializable;
 
 public class FileSyncData implements Serializable
-{
+{private static final long serialVersionUID = 2L;
     private FileData fileData;
     private RequestType requestType;
     private String ownerId;
+    private String newFileName;
 
     public FileData getFileData()
     {
@@ -36,6 +37,14 @@ public class FileSyncData implements Serializable
     public void setOwnerId(String ownerId)
     {
         this.ownerId = ownerId;
+    }
+
+    public String getNewFileName() {
+        return newFileName;
+    }
+
+    public void setNewFileName(String newFileName) {
+        this.newFileName = newFileName;
     }
 }
 
